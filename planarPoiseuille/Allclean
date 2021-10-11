@@ -1,0 +1,33 @@
+#!/bin/sh
+cd ${0%/*} || exit 1	# Run from this directory
+echo "Cleaning $PWD case"
+
+rm  -rf
+
+zeros=""
+    while [ ${#zeros} -lt 8 ]
+    do
+        timeDir="0.${zeros}[1-9]*"
+        rm -rf ./${timeDir} ./-${timeDir} > /dev/null 2>&1
+        zeros="0$zeros"
+    done
+
+    rm -rf ./[1-9]* ./-[1-9]* ./log ./log.* ./logSummary.* \
+        ./*.OpenFOAM ./*.blockMesh ./*.foam ./.setSet
+
+    for d in constant 0
+    do
+        rm -rf $d/polyMesh     $d/*/polyMesh \
+               $d/cellToRegion $d/*/cellToRegion \
+               $d/cellLevel*   $d/pointLevel* \
+               $d/cellDist     $d/cellDecomposition
+    done
+
+    [ -d system ] && [ -d dynamicCode ] && rm -rf dynamicCode
+
+    rm -rf processor*
+    rm -rf postProcessing
+    rm -rf jobInfo TDAC constant/tetDualMesh
+    rm -rf VTK sequencedVTK
+
+    find . -name "*.orig" -type f -exec sh -c 'rm -f ${0%.*} ${0%.*}.gz' {} \;
